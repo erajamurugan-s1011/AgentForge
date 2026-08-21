@@ -7,3 +7,5 @@ __pycache__/
 data/*.db
 .DS_Store
 guide.txt
+agentforge/data/escalation_queue.json
+qdrant_storage/

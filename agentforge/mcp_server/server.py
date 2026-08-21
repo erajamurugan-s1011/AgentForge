@@ -60,6 +60,61 @@ def kb_search(query: str, category: str = "", top_k: int = 3) -> list[dict]:
         for r in results
     ]
 
+import json
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
 
+ESCALATION_QUEUE_FILE = Path(__file__).parent.parent / "data" / "escalation_queue.json"
+
+_SYSTEM_STATUS = {
+    "vpn_gateway": {"status": "operational", "note": ""},
+    "wifi_network": {"status": "operational", "note": ""},
+    "email_server": {"status": "degraded", "note": "Some users seeing delayed delivery, ETA 2h"},
+    "confluence_wiki": {"status": "operational", "note": ""},
+    "jira": {"status": "operational", "note": ""},
+    "license_server": {"status": "operational", "note": ""},
+}
+
+
+@mcp.tool
+def check_status(system: str) -> dict:
+    """Check the current operational status of an internal IT system.
+
+    Args:
+        system: One of vpn_gateway, wifi_network, email_server, confluence_wiki, jira, license_server.
+    """
+    return _SYSTEM_STATUS.get(
+        system, {"status": "unknown", "note": f"'{system}' is not a recognized system name"}
+    )
+
+
+@mcp.tool
+def create_escalation(summary: str, priority: str, category: str) -> dict:
+    """Escalate a ticket to the human L2 support queue.
+
+    Args:
+        summary: A concise summary of the issue and what was already tried.
+        priority: One of low, medium, high.
+        category: One of network, access, hardware, software, other.
+    """
+    ESCALATION_QUEUE_FILE.parent.mkdir(exist_ok=True)
+    queue = []
+    if ESCALATION_QUEUE_FILE.exists():
+        queue = json.loads(ESCALATION_QUEUE_FILE.read_text())
+
+    ticket_id = f"ESC-{uuid.uuid4().hex[:8]}"
+    entry = {
+        "ticket_id": ticket_id,
+        "summary": summary,
+        "priority": priority,
+        "category": category,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "status": "pending_l2_review",
+    }
+    queue.append(entry)
+    ESCALATION_QUEUE_FILE.write_text(json.dumps(queue, indent=2))
+
+    return {"ticket_id": ticket_id, "status": "escalated"}
 if __name__ == "__main__":
     mcp.run()
