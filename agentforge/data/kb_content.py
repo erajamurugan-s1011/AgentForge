@@ -1,0 +1,86 @@
+KB_ARTICLES = [
+    {
+        "id": "kb001",
+        "category": "network",
+        "title": "VPN connection fails with error 807",
+        "content": "Error 807 usually means the VPN client cannot reach the gateway due to a firewall or unstable network. Steps: 1) Switch from Wi-Fi to a wired connection if possible. 2) Restart the VPN client. 3) Confirm the corporate firewall allows outbound traffic on port 443. 4) If on a home network, restart the router. If the issue persists after these steps, escalate to network team with a screenshot of the error.",
+    },
+    {
+        "id": "kb002",
+        "category": "network",
+        "title": "Wi-Fi keeps disconnecting on company laptop",
+        "content": "Intermittent Wi-Fi drops are commonly caused by outdated Wi-Fi adapter drivers or power-saving settings disabling the adapter. Steps: 1) Open Device Manager, update the Wi-Fi adapter driver. 2) In adapter properties, disable 'Allow the computer to turn off this device to save power'. 3) Forget and rejoin the network. Escalate if the laptop is less than 6 months old and issue persists after driver update.",
+    },
+    {
+        "id": "kb003",
+        "category": "network",
+        "title": "Cannot access internal wiki or Confluence",
+        "content": "Internal sites are only reachable while connected to VPN or on-site network. Confirm VPN is active and shows 'Connected' status. If VPN is connected but the site still fails to load, clear DNS cache with 'ipconfig /flushdns' and retry. If it still fails, the wiki service itself may be down; check the status page before escalating.",
+    },
+    {
+        "id": "kb004",
+        "category": "access",
+        "title": "Forgot password / account locked out",
+        "content": "Self-service password reset is available at the company SSO portal under 'Forgot Password'. Accounts lock after 5 failed attempts and auto-unlock after 30 minutes. For immediate unlock, IT can manually reset via the identity admin console after verifying employee ID and manager approval.",
+    },
+    {
+        "id": "kb005",
+        "category": "access",
+        "title": "Need access to Jira project",
+        "content": "Jira project access requires manager approval submitted through the access request portal. Standard turnaround is 1 business day. Temporary read-only access can be granted immediately by the project's Jira admin if the requester is already in the same department group.",
+    },
+    {
+        "id": "kb006",
+        "category": "access",
+        "title": "New employee has no email account set up",
+        "content": "Email accounts are provisioned automatically 1 business day after HR marks the employee as active in the HR system. If it has been longer than 1 business day, check the HR system status first — a pending background check can delay provisioning. Manual provisioning requires HR ticket number.",
+    },
+    {
+        "id": "kb007",
+        "category": "hardware",
+        "title": "Laptop won't turn on",
+        "content": "First rule out a dead battery: plug into power directly and hold power button for 15 seconds, then try powering on. If no response with power connected, try a different power outlet and cable. If still no response, this requires hardware replacement — escalate to IT asset team with the laptop's asset tag.",
+    },
+    {
+        "id": "kb008",
+        "category": "hardware",
+        "title": "External monitor not detected",
+        "content": "Steps: 1) Check the cable is fully seated at both ends. 2) Try a different cable/port if available (some laptops need a specific USB-C port for video). 3) In Display Settings, click 'Detect'. 4) Update graphics driver. If the monitor works on a different laptop, the issue is laptop-side and should be escalated with the laptop's asset tag.",
+    },
+    {
+        "id": "kb009",
+        "category": "hardware",
+        "title": "Printer shows offline",
+        "content": "Confirm the printer is powered on and connected to the same network. On Windows, go to Settings > Printers, remove the printer, and re-add it via 'Add a printer or scanner'. If multiple people report the same printer offline, the issue is likely the printer itself or its network connection, not individual machines.",
+    },
+    {
+        "id": "kb010",
+        "category": "software",
+        "title": "Outlook not syncing new emails",
+        "content": "Steps: 1) Check Outlook is in Online mode, not Offline (Send/Receive tab). 2) Restart Outlook. 3) Check mailbox storage isn't full. 4) Repair the Outlook profile via Control Panel > Mail > Show Profiles > Repair. If the mobile Outlook app also fails to sync, the issue is server-side — escalate immediately.",
+    },
+    {
+        "id": "kb011",
+        "category": "software",
+        "title": "Application crashes on startup",
+        "content": "Steps: 1) Check for pending Windows updates and install them. 2) Run the application as administrator once to rule out permission issues. 3) Check Event Viewer > Application logs for the crash error code. 4) Reinstall the application if steps 1-3 don't resolve it. Include the Event Viewer error code when escalating.",
+    },
+    {
+        "id": "kb012",
+        "category": "software",
+        "title": "License activation error for design software",
+        "content": "License servers are checked every 30 days for floating licenses. If activation fails, confirm the laptop is connected to VPN (license server is internal-only). If VPN is connected and it still fails, the license pool may be exhausted for that title — this requires IT to check available seats before granting a new one.",
+    },
+    {
+        "id": "kb013",
+        "category": "other",
+        "title": "How to request new equipment (monitor, keyboard, headset)",
+        "content": "Equipment requests go through the asset request portal, not the standard IT ticket queue. Standard equipment ships within 3-5 business days. Non-standard or high-cost equipment requires manager approval attached to the request.",
+    },
+    {
+        "id": "kb014",
+        "category": "other",
+        "title": "Company laptop policy for personal use",
+        "content": "Company laptops are for business use; limited personal use (checking personal email, light browsing) is permitted under the acceptable use policy. Installing personal software or games is not permitted without IT approval, as it can conflict with security monitoring tools.",
+    },
+]
