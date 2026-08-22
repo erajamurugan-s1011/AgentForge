@@ -22,9 +22,19 @@ class TicketResponse(BaseModel):
 
 @app.on_event("startup")
 async def warm_up():
-    print("Warming up: loading embedding model and testing Qdrant connection...")
-    get_embed_model()
-    get_qdrant_client().get_collections()
+    print("Warming up: loading embedding model...")
+    try:
+        get_embed_model()
+        print("Embedding model loaded.")
+    except Exception as e:
+        print(f"Warning: embedding model failed to preload: {e}")
+
+    try:
+        get_qdrant_client().get_collections()
+        print("Qdrant connection verified.")
+    except Exception as e:
+        print(f"Warning: Qdrant warm-up check failed (will retry on first real request): {e}")
+
     print("Warm-up complete.")
 
 
