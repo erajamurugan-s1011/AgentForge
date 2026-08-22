@@ -2,6 +2,7 @@ import uuid
 from typing import TypedDict, Optional
 from langgraph.graph import StateGraph, END
 
+from agentforge.agents.guardrail import run_guardrail
 from agentforge.agents.planner import run_planner
 from agentforge.agents.retriever import run_retriever
 from agentforge.agents.executor import run_executor
@@ -15,6 +16,8 @@ CONFIDENCE_THRESHOLD = 0.6
 class AgentState(TypedDict):
     ticket_text: str
     trace_id: str
+    is_safe: Optional[bool]
+    unsafe_reason: Optional[str]
     category: Optional[str]
     priority: Optional[str]
     status_check_system: Optional[str]
@@ -25,6 +28,23 @@ class AgentState(TypedDict):
     unsupported_claims: list
     final_action: Optional[str]
     escalation_ticket_id: Optional[str]
+
+
+def guardrail_node(state: AgentState) -> dict:
+    verdict = run_guardrail(state["ticket_text"])
+    return {"is_safe": verdict["is_safe"], "unsafe_reason": verdict.get("reason", "")}
+
+
+def blocked_node(state: AgentState) -> dict:
+    return {
+        "final_action": "blocked",
+        "draft_response": "This request could not be processed for security reasons. Please contact IT directly if you have a genuine support need.",
+        "confidence_score": 0.0,
+    }
+
+
+def route_after_guardrail(state: AgentState) -> str:
+    return "planner" if state["is_safe"] else "blocked"
 
 
 def planner_node(state: AgentState) -> dict:
@@ -85,6 +105,8 @@ def route_after_critique(state: AgentState) -> str:
 
 def build_graph():
     graph = StateGraph(AgentState)
+    graph.add_node("guardrail", guardrail_node)
+    graph.add_node("blocked", blocked_node)
     graph.add_node("planner", planner_node)
     graph.add_node("retriever", retriever_node)
     graph.add_node("executor", executor_node)
@@ -92,7 +114,9 @@ def build_graph():
     graph.add_node("resolve", resolve_node)
     graph.add_node("escalate", escalate_node)
 
-    graph.set_entry_point("planner")
+    graph.set_entry_point("guardrail")
+    graph.add_conditional_edges("guardrail", route_after_guardrail, {"planner": "planner", "blocked": "blocked"})
+    graph.add_edge("blocked", END)
     graph.add_edge("planner", "retriever")
     graph.add_edge("retriever", "executor")
     graph.add_edge("executor", "critique")
