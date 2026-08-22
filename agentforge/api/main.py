@@ -11,9 +11,11 @@ class TicketRequest(BaseModel):
 
 
 class TicketResponse(BaseModel):
-    trace_id: str
-    category: str
-    priority: str
+    trace_id: str | None = None
+    is_safe: bool
+    unsafe_reason: str | None = None
+    category: str | None = None
+    priority: str | None = None
     draft_response: str
     confidence_score: float
     final_action: str
@@ -47,9 +49,11 @@ def health():
 async def submit_ticket(request: TicketRequest):
     result = await agentforge_graph.ainvoke({"ticket_text": request.ticket_text})
     return TicketResponse(
-        trace_id=result["trace_id"],
-        category=result["category"],
-        priority=result["priority"],
+        trace_id=result.get("trace_id"),
+        is_safe=result["is_safe"],
+        unsafe_reason=result.get("unsafe_reason"),
+        category=result.get("category"),
+        priority=result.get("priority"),
         draft_response=result["draft_response"],
         confidence_score=result["confidence_score"],
         final_action=result["final_action"],
