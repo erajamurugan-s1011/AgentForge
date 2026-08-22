@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Import smoke test
+        run: |
+          python -c "from agentforge.agents.planner import run_planner; print('planner OK')"
+          python -c "from agentforge.agents.retriever import run_retriever; print('retriever OK')"
+          python -c "from agentforge.agents.executor import run_executor; print('executor OK')"
+          python -c "from agentforge.agents.critique import run_critique; print('critique OK')"
+          python -c "from agentforge.agents.graph import agentforge_graph; print('graph OK')"
+          python -c "from agentforge.api.main import app; print('api OK')"
+          python -c "from agentforge.mcp_server.server import mcp; print('mcp server OK')"
