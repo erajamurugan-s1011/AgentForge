@@ -1,3 +1,4 @@
+import os
 from fastmcp import FastMCP
 from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
@@ -19,7 +20,8 @@ def get_embed_model():
 def get_qdrant_client():
     global _qdrant_client
     if _qdrant_client is None:
-        _qdrant_client = QdrantClient(host="localhost", port=6333)
+        qdrant_host = os.getenv("QDRANT_HOST", "localhost")
+        _qdrant_client = QdrantClient(host=qdrant_host, port=6333)
     return _qdrant_client
 
 
@@ -59,6 +61,7 @@ def kb_search(query: str, category: str = "", top_k: int = 3) -> list[dict]:
         }
         for r in results
     ]
+
 
 import json
 import uuid
@@ -116,5 +119,7 @@ def create_escalation(summary: str, priority: str, category: str) -> dict:
     ESCALATION_QUEUE_FILE.write_text(json.dumps(queue, indent=2))
 
     return {"ticket_id": ticket_id, "status": "escalated"}
+
+
 if __name__ == "__main__":
     mcp.run()
