@@ -20,8 +20,13 @@ def get_embed_model():
 def get_qdrant_client():
     global _qdrant_client
     if _qdrant_client is None:
-        qdrant_host = os.getenv("QDRANT_HOST", "localhost")
-        _qdrant_client = QdrantClient(host=qdrant_host, port=6333)
+        cloud_url = os.getenv("QDRANT_CLOUD_URL")
+        cloud_key = os.getenv("QDRANT_CLOUD_API_KEY")
+        if cloud_url and cloud_key:
+            _qdrant_client = QdrantClient(url=cloud_url, api_key=cloud_key)
+        else:
+            qdrant_host = os.getenv("QDRANT_HOST", "localhost")
+            _qdrant_client = QdrantClient(host=qdrant_host, port=6333)
     return _qdrant_client
 
 

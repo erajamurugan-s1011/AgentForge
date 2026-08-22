@@ -1,7 +1,11 @@
+import os
+from dotenv import load_dotenv
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from sentence_transformers import SentenceTransformer
 from agentforge.data.kb_content import KB_ARTICLES
+
+load_dotenv()
 
 COLLECTION_NAME = "helpdesk_kb"
 EMBED_MODEL = "all-MiniLM-L6-v2"
@@ -11,7 +15,14 @@ def main():
     print("Loading embedding model...")
     model = SentenceTransformer(EMBED_MODEL)
 
-    client = QdrantClient(host="localhost", port=6333)
+    cloud_url = os.getenv("QDRANT_CLOUD_URL")
+    cloud_key = os.getenv("QDRANT_CLOUD_API_KEY")
+    if cloud_url and cloud_key:
+        client = QdrantClient(url=cloud_url, api_key=cloud_key)
+        print("Connecting to Qdrant Cloud")
+    else:
+        client = QdrantClient(host=os.getenv("QDRANT_HOST", "localhost"), port=6333)
+        print("Connecting to local Qdrant")
 
     vector_size = model.get_sentence_embedding_dimension()
     client.recreate_collection(
@@ -19,6 +30,13 @@ def main():
         vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
     )
     print(f"Collection '{COLLECTION_NAME}' created (dim={vector_size})")
+
+    client.create_payload_index(
+        collection_name=COLLECTION_NAME,
+        field_name="category",
+        field_schema="keyword",
+    )
+    print("Payload index created on 'category' field")
 
     texts = [f"{a['title']}. {a['content']}" for a in KB_ARTICLES]
     print(f"Embedding {len(texts)} articles...")
